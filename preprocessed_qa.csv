@@ -1,0 +1,2 @@
+question_id,domain,question,ideal_answer,question_tokens,ideal_answer_tokens
+1,Science,what is the powerhouse of the cell?,mitochondria,"['powerhouse', 'cell']",['mitochondria']
