@@ -22,7 +22,7 @@ stop_words = set(stopwords.words('english'))
 def preprocess_text(text):
     tokens = word_tokenize(text)
     tokens = [word for word in tokens if word.isalnum() and word not in stop_words]
-    return tokens
+    return ' '.join(tokens)
 
 data['question_tokens'] = data['question'].apply(preprocess_text)
 data['ideal_answer_tokens'] = data['ideal_answer'].apply(preprocess_text)
