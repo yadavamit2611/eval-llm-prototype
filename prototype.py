@@ -5,7 +5,7 @@ from nltk.corpus import stopwords
 import os
 
 # Load the dataset
-data = pd.read_csv('questions_answers.csv')
+data = pd.read_csv('politics-dataset.csv')
 
 # Data Cleaning
 data.drop_duplicates(inplace=True)
@@ -39,7 +39,7 @@ def get_llm_response(question,test_model):
     completion = client.chat.completions.create(
     model=test_model,
     messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "system", "content": "You are a helpful assistant. Provide short and concise answers"},
         {"role": "user", "content": question}
     ]
     )

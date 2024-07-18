@@ -7,7 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 df = pd.read_csv('responses.csv')
 
 # Ensure necessary columns are present
-required_columns = {'question', 'ideal_answer', 'gpt3.5-turbo_response', 'gpt-4-turbo_response'}
+required_columns = {'question_tokens', 'ideal_answer_tokens', 'gpt3.5-turbo_response', 'gpt-4-turbo_response'}
 if not required_columns.issubset(df.columns):
     raise ValueError(f"The CSV file must contain the columns: {required_columns}")
 
@@ -24,8 +24,8 @@ def get_bert_embedding(text):
     return outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
 
 # Compute BERT embeddings
-df['Question Embedding'] = df['question'].apply(get_bert_embedding)
-df['Ideal Answer Embedding'] = df['ideal_answer'].apply(get_bert_embedding)
+df['Question Embedding'] = df['question_tokens'].apply(get_bert_embedding)
+df['Ideal Answer Embedding'] = df['ideal_answer_tokens'].apply(get_bert_embedding)
 df['LLM GPT 3.5 Response Embedding'] = df['gpt3.5-turbo_response'].apply(get_bert_embedding)
 df['LLM GPT 4 Response Embedding'] = df['gpt-4-turbo_response'].apply(get_bert_embedding)
 
