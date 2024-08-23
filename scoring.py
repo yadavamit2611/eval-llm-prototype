@@ -142,7 +142,7 @@ df['METEOR GPT4'] = df.apply(lambda row: calculate_meteor(row['Answer_tokens'], 
 df.drop(columns=['Question Embedding', 'Ideal Answer Embedding', 'LLM GPT 3.5 Response Embedding', 'LLM GPT 4 Response Embedding'], inplace=True)
 
 # Save the DataFrame with composite scores and additional metrics to a new CSV file
-output_file = 'final_score_with_bleu_rouge_meteor.csv'
+output_file = 'final_score.csv'
 df.to_csv(output_file, index=False)
 
 # Prepare data for insertion into MongoDB
