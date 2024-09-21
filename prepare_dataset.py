@@ -6,11 +6,11 @@ from pymongo import MongoClient
 import os
 
 #set value to false when needed to test for big dataset
-dummy = True
+dummy = False
 
 # MongoDB Configuration
 mongo_uri = "mongodb://localhost:27017/"
-client = MongoClient(mongo_uri)
+client = MongoClient(mongo_uri) 
 db = client["eval_db"]
 if(dummy):
     collection = db["dummy_data"]
@@ -29,12 +29,12 @@ def preprocess_text(text):
     tokens = [word for word in tokens if word.isalnum() and word not in stop_words]
     return ' '.join(tokens)
 
-from openai import OpenAI
-client = OpenAI()
+import openai
+""" client = OpenAI() """
 
 # Function to get LLM response
 def get_llm_response(Question,test_model):
-    completion = client.chat.completions.create(
+    completion = openai.ChatCompletion.create(
     model=test_model,
     messages=[
         {"role": "system", "content": "You are a helpful assistant. Provide short and concise answers"},

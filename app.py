@@ -12,7 +12,7 @@ db = client["eval_db"]
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
-    collection = db["dummy_composite_scores"]
+    collection = db["composite_scores"]
     data = list(collection.find({}))
     for record in data:
         record['_id'] = str(record['_id'])  # Convert ObjectId to string

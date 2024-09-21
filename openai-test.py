@@ -1,8 +1,8 @@
-from openai import OpenAI
+import openai
 
-client = OpenAI()
+""" client = OpenAI() """
 
-completion = client.chat.completions.create(
+completion = openai.ChatCompletion.create(
   model="gpt-3.5-turbo",
   messages=[
     {"role": "system", "content": "You are a poetic assistant, skilled in explaining complex programming concepts with creative flair."},
@@ -10,4 +10,4 @@ completion = client.chat.completions.create(
   ]
 )
 
-print(completion.choices[0].message)
+print(completion.choices[0].message.content)

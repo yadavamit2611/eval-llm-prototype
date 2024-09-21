@@ -7,13 +7,18 @@ import nltk
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
 from nltk.translate.meteor_score import meteor_score
+import wikipediaapi
+import spacy
+
+# Load the pre-trained spaCy model
+nlp = spacy.load("en_core_web_sm")
 
 # Download necessary NLTK data
 nltk.download('wordnet')
 nltk.download('punkt')
 
 # Set dummy to True for testing
-dummy = True
+dummy = False
 mongo_uri = "mongodb://localhost:27017/"
 client = MongoClient(mongo_uri)
 db = client["eval_db"]
@@ -65,16 +70,89 @@ df['SemanticSimilarity GPT3.5 Response'] = df.apply(
 df['SemanticSimilarity GPT4 Response'] = df.apply(
     lambda row: compute_cosine_similarity(row['Ideal Answer Embedding'], row['LLM GPT 4 Response Embedding']), axis=1)
 
+# Initialize Wikipedia API with a proper User-Agent
+def get_wikipedia_summary(query):
+    wiki_wiki = wikipediaapi.Wikipedia(
+        language='en',
+        user_agent="FactChecker/1.0 (factchecker@example.com)"
+    )
+    page = wiki_wiki.page(query)
+    if page.exists():
+        return page.summary
+    return None
+
+# Function to get embeddings
+def get_embeddings(text, tokenizer, model):
+    inputs = tokenizer(text, return_tensors='pt', truncation=True, padding=True)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    embeddings = outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
+    return embeddings
+
+# Function to compare claim with each sentence in evidence
+def compare_claim_with_evidence(claim, evidence, tokenizer, model):
+    claim_embedding = get_embeddings(claim, tokenizer, model)
+    sentences = evidence.split('. ')
+    max_similarity = -1
+    best_sentence = None
+
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if sentence:
+            sentence_embedding = get_embeddings(sentence, tokenizer, model)
+            similarity = 1 - compute_cosine_similarity(claim_embedding, sentence_embedding)
+            if similarity > max_similarity:
+                max_similarity = similarity
+                best_sentence = sentence
+
+    return best_sentence, max_similarity
+
+# Main function to run fact-checking pipeline
+def fact_check_claim(claim, topic):
+    print(f"Claim: {claim}")
+
+    # Retrieve evidence from Wikipedia
+    evidence = get_wikipedia_summary(topic)
+    if evidence:
+        print(f"Evidence from Wikipedia:\n{evidence}...\n")  # Limiting output for readability
+
+        # Compare claim with evidence sentences
+        best_sentence, max_similarity = compare_claim_with_evidence(claim, evidence, tokenizer, model)
+
+        if best_sentence:
+            print(f"Best Matching Sentence: {best_sentence}")
+            print(f"Similarity Score: {max_similarity:.2f}")
+        else:
+            print("No relevant sentences found.")
+    else:
+        print("No relevant evidence found on Wikipedia.")
+
+    return max_similarity
+
+def extract_named_entities(sentence):
+    # Process the sentence with spaCy
+    print(sentence)
+
+    doc = nlp(sentence)
+    
+    # Extract named entities
+    entities = [(ent.text, ent.label_) for ent in doc.ents]
+    
+    return entities
+
 # Placeholder functions for factual verification and contextual relevance
-def factual_verification(llm_response):
-    return 1  # Example: always factually correct
+def factual_verification(sector, llm_response):
+   """  topic = extract_named_entities(sector)
+    print(topic, llm_response) """
+   result = fact_check_claim(llm_response, sector)
+   return result
 
 def contextual_relevance(question_embedding, llm_response_embedding):
     return compute_cosine_similarity(question_embedding, llm_response_embedding)
 
 # Apply factual verification and contextual relevance
-df['Factual Verification GPT3.5 Response'] = df['gpt3.5-turbo_response_tokens'].apply(factual_verification)
-df['Factual Verification GPT4 Response'] = df['gpt-4-turbo_response_tokens'].apply(factual_verification)
+df['Factual Verification GPT3.5 Response'] = df.apply(lambda row: factual_verification(row['Sector'],row['gpt3.5-turbo_response_tokens']),axis=1)
+df['Factual Verification GPT4 Response'] = df.apply(lambda row: factual_verification(row['Sector'],row['gpt-4-turbo_response_tokens']),axis=1)
 df['Contextual Relevance GPT3.5 Response'] = df.apply(
     lambda row: contextual_relevance(row['Question Embedding'], row['LLM GPT 3.5 Response Embedding']), axis=1)
 df['Contextual Relevance GPT4 Response'] = df.apply(
@@ -124,9 +202,9 @@ def calculate_rouge(reference, hypothesis):
 
 # Function to calculate METEOR score
 def calculate_meteor(reference, hypothesis):
-    reference_tokens = reference.split()
-    hypothesis_tokens = hypothesis.split()
-    return meteor_score([reference_tokens], hypothesis_tokens)
+    reference = ' '.join(reference) if isinstance(reference, list) else reference
+    hypothesis = ' '.join(hypothesis) if isinstance(hypothesis, list) else hypothesis
+    return meteor_score([reference], hypothesis)
 
 # Calculate BLEU, ROUGE, and METEOR scores for GPT-3.5 responses
 df['BLEU GPT3.5'] = df.apply(lambda row: calculate_bleu(row['Answer_tokens'], row['gpt3.5-turbo_response_tokens']), axis=1)
