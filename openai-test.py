@@ -3,10 +3,10 @@ import openai
 """ client = OpenAI() """
 
 completion = openai.ChatCompletion.create(
-  model="gpt-3.5-turbo",
+  model="gpt-4-turbo",
   messages=[
-    {"role": "system", "content": "You are a poetic assistant, skilled in explaining complex programming concepts with creative flair."},
-    {"role": "user", "content": "Compose a poem that explains the concept of recursion in programming."}
+    {"role": "system", "content": "You are a judge who is responds with just one numerical value in between 0.0 to 1.0 based on the claim provided"},
+    {"role": "user", "content": "lionel messi is the greatest player in the football history"}
   ]
 )
 

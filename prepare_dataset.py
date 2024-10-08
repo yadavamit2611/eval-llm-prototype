@@ -1,7 +1,4 @@
 import pandas as pd
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
 from pymongo import MongoClient
 import os
 
@@ -14,20 +11,16 @@ client = MongoClient(mongo_uri)
 db = client["eval_db"]
 if(dummy):
     collection = db["dummy_data"]
-    response_collection = db["dummy_responses_token"]
+    if "dummy_responses_token" in db.list_collection_names():
+        db.drop_collection("dummy_responses")
+        print("dropped dummy responses")
+    response_collection = db["dummy_responses"]
 else:
     collection = db["question_answers"]
-    response_collection = db["responses_token"]
-
-# Tokenization and Normalization
-nltk.download('punkt')
-nltk.download('stopwords')
-stop_words = set(stopwords.words('english'))
-
-def preprocess_text(text):
-    tokens = word_tokenize(text)
-    tokens = [word for word in tokens if word.isalnum() and word not in stop_words]
-    return ' '.join(tokens)
+    if "responses_token" in db.list_collection_names():
+        db.drop_collection("responses")
+        print("dropped responses")
+    response_collection = db["responses"]
 
 import openai
 """ client = OpenAI() """
@@ -54,18 +47,9 @@ df.dropna(inplace=True)
 df['Question'] = df['Question'].str.lower().str.strip()
 df['Answer'] = df['Answer'].str.lower().str.strip()
 
-# Tokenization and Normalization
-df['Question_tokens'] = df['Question'].apply(preprocess_text)
-df['Answer_tokens'] = df['Answer'].apply(preprocess_text)
-
 # Add LLM responses
 df['gpt3.5-turbo_response'] = df['Question'].apply(lambda q: get_llm_response(q, "gpt-3.5-turbo"))
 df['gpt-4-turbo_response'] = df['Question'].apply(lambda q: get_llm_response(q, "gpt-4-turbo"))
-
-df['gpt3.5-turbo_response_tokens'] = df['gpt3.5-turbo_response'].apply(preprocess_text)
-df['gpt-4-turbo_response_tokens'] = df['gpt-4-turbo_response'].apply(preprocess_text)
-
-df = df.drop(columns=['gpt3.5-turbo_response', 'gpt-4-turbo_response'])
 
 # Prepare data for insertion into MongoDB
 response_docs = df.to_dict(orient='records')
@@ -74,7 +58,7 @@ response_docs = df.to_dict(orient='records')
 response_collection.insert_many(response_docs)
 
 # Print confirmation
-print(f"Inserted {len(response_docs)} documents into the ","dummy_responses_token" if dummy else "responses_token"," collection.")
+print(f"Inserted {len(response_docs)} documents into the ","dummy_responses_token" if dummy else "responses"," collection.")
 
 # Optional: Save the processed dataset to CSV for local verification
 output_file = 'responses.csv'

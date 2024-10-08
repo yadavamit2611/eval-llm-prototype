@@ -1,12 +1,14 @@
 Project LLM Evaluation backend
-A project to evaluate llm responses against ideal set of answers for specific question and answers dataset.
+A project to evaluate llm questin and answer systems.
 Evaluation done based on different metrics
-1. Cosine Similartiy (embeddings)
+1. Semantic Similarity
 2. BLEU
 3. METEOR
 4. ROUGE
+5. BERTScore
+6. Perplexity
 
 Composite Scoring done based on :
-1. Semantic Similarity  (Cosine similarity)- done  (Measuring the cosine similarity between the llm response embeddings and the ideal answer embeddings)
-2. Factual verification - pending
-3. Contextual relevance - done
+1. Semantic Similarity - calculate cosine similarity using bert embeddings
+2. Factual verification - done using llms
+3. Contextual relevance - BERTscore

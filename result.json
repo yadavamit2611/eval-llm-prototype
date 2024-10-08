@@ -1,0 +1,192 @@
+{
+    "question": {
+        "original": "what is an algorithm?",
+        "processed": "algorithm"
+    },
+    "ideal_answer": {
+        "original": "An algorithm is a step-by-step procedure or formula for solving a problem or performing a task in computing",
+        "processed": "algorithm procedure formula solving problem performing task computing"
+    },
+    "gpt3-5-answer": {
+        "original": "An algorithm is a step-by-step procedure or set of rules to be followed in calculations or problem-solving operations.",
+        "processed": "An algorithm procedure formula solving problem accomplishing task"
+    },
+    "gpt4-answer": {
+        "original": "An algorithm is a set of step-by-step instructions or rules designed to perform a specific task or solve a particular problem.",
+        "processed": "An algorithm set instructions designed perform specific task solve particular problem"
+    },
+    "perplexity": {
+        "gpt3-5-perplexity": {
+            "original": 23.69,
+            "processed": 7192.53
+        },
+        "gpt4-perplexity": {
+            "original": 12.85,
+            "processed": 6676.14
+        }
+    },
+    "bleu": {
+        "gpt3-5-bleu": {
+            "original": 0.35,
+            "processed": 0.54
+        },
+        "gpt4-bleu": {
+            "original": 0.14,
+            "processed": 0.02
+        }
+    },
+    "rouge": {
+        "gpt3-5-rouge": {
+            "original": {
+                "rouge1": [
+                    0.6190476190476191,
+                    0.65,
+                    0.6341463414634146
+                ],
+                "rouge2": [
+                    0.4,
+                    0.42105263157894735,
+                    0.41025641025641024
+                ],
+                "rougeL": [
+                    0.47619047619047616,
+                    0.5,
+                    0.4878048780487805
+                ]
+            },
+            "processed": {
+                "rouge1": [
+                    0.75,
+                    0.75,
+                    0.75
+                ],
+                "rouge2": [
+                    0.5714285714285714,
+                    0.5714285714285714,
+                    0.5714285714285714
+                ],
+                "rougeL": [
+                    0.75,
+                    0.75,
+                    0.75
+                ]
+            }
+        },
+        "gpt4-rouge": {
+            "original": {
+                "rouge1": [
+                    0.6521739130434783,
+                    0.75,
+                    0.6976744186046512
+                ],
+                "rouge2": [
+                    0.3181818181818182,
+                    0.3684210526315789,
+                    0.3414634146341463
+                ],
+                "rougeL": [
+                    0.4782608695652174,
+                    0.55,
+                    0.5116279069767442
+                ]
+            },
+            "processed": {
+                "rouge1": [
+                    0.45454545454545453,
+                    0.625,
+                    0.5263157894736842
+                ],
+                "rouge2": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rougeL": [
+                    0.2727272727272727,
+                    0.375,
+                    0.3157894736842105
+                ]
+            }
+        }
+    },
+    "meteor": {
+        "gpt3-5-meteor": {
+            "original": 0.56,
+            "processed": 0.74
+        },
+        "gpt4-meteor": {
+            "original": 0.59,
+            "processed": 0.3
+        }
+    },
+    "bertscore": {
+        "gpt3-5-bscore": {
+            "original": 0.94,
+            "processed": 0.93
+        },
+        "gpt4-bscore": {
+            "original": 0.94,
+            "processed": 0.87
+        }
+    },
+    "semantic similartiy": {
+        "gpt3-5-ss": {
+            "original": 0.96,
+            "processed": 0.92
+        },
+        "gpt4-ss": {
+            "original": 0.94,
+            "processed": 0.8
+        }
+    },
+    "factual verification": {
+        "gpt3-5-fv": {
+            "original": 0.21,
+            "processed": 0.35
+        },
+        "gpt4-fv": {
+            "original": 0.2,
+            "processed": 0.39
+        }
+    },
+    "llm factual verification": {
+        "gpt3-5-llmfv": {
+            "original": 1.0,
+            "processed": 0.9
+        },
+        "gpt4-llmfv": {
+            "original": 1.0,
+            "processed": 1.0
+        }
+    },
+    "Contextual relevance": {
+        "gpt3-5-cr": {
+            "original": 0.96,
+            "processed": 0.92
+        },
+        "gpt4-cr": {
+            "original": 0.94,
+            "processed": 0.8
+        }
+    },
+    "old-Composite-score": {
+        "gpt3-5-ocs": {
+            "original": 0.66,
+            "processed": 0.69
+        },
+        "gpt4-ocs": {
+            "original": 0.64,
+            "processed": 0.68
+        }
+    },
+    "new-Composite-score": {
+        "gpt3-5-ncs": {
+            "original": 0.97,
+            "processed": 0.91
+        },
+        "gpt4-ncs": {
+            "original": 0.96,
+            "processed": 0.94
+        }
+    }
+}
