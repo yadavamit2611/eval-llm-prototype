@@ -91,15 +91,25 @@ df['SemanticSimilarity GPT4 Response'] = df.apply(
     lambda row: round(compute_cosine_similarity(row['Ideal Answer Embedding'], row['LLM GPT 4 Response Embedding']),2), axis=1)
 
 #verify from gpt-4
-def llmFactualVerification(claim):
-    completion = openai.ChatCompletion.create(
-    model="gpt-4",
-    messages=[
-        {"role": "system", "content": "You are a judge who responds with just one numerical value in between 0.0 to 1.0 based on the claim provided"},
-        {"role": "user", "content": claim}
-    ]
+def llmFactualVerification(question, claim):
+    prompt = f"""
+    Your task is to evaluate whether the answer for the given question is factually correct based on your knowledge.
+    Return the factual correctness score only as a numerical value between 0.0 and 1.0. 
+    Question: {question}
+    Answer: {claim}
+    """
+    # Make API call to OpenAI's GPT model
+    response = openai.ChatCompletion.create(
+        model="gpt-4",  # You can switch to "gpt-4" if needed
+        messages=[
+            {"role": "system", "content": "You are a judge who responds with just one numerical value in between 0.0 to 1.0 based on the prompt provided"},
+            {"role": "user", "content": prompt}
+        ],
     )
-    return round(float(completion.choices[0].message.content),2)
+
+    # Extracting the numerical value from the response
+    result = response['choices'][0]['message']['content'].strip()
+    return float(result)
 
 def contextual_relevance(question_embedding, llm_response_embedding):
     cont_rel = compute_cosine_similarity(question_embedding, llm_response_embedding)
@@ -108,8 +118,8 @@ def contextual_relevance(question_embedding, llm_response_embedding):
 # Apply factual verification and contextual relevance
 """ df['Factual Verification GPT3.5 Response'] = df.apply(lambda row: factual_verification(row['Question_tokens'],row['gpt3.5-turbo_response']),axis=1)
 df['Factual Verification GPT4 Response'] = df.apply(lambda row: factual_verification(row['Question_tokens'],row['gpt-4-turbo_response']),axis=1) """
-df['LLM Fact Verification GPT3.5 Response'] = df.apply(lambda row: llmFactualVerification(row['gpt3.5-turbo_response']),axis=1)
-df['LLM Fact Verification GPT4 Response'] = df.apply(lambda row: llmFactualVerification(row['gpt-4-turbo_response']),axis=1)
+df['LLM Fact Verification GPT3.5 Response'] = df.apply(lambda row: llmFactualVerification(row['Question'], row['gpt3.5-turbo_response']),axis=1)
+df['LLM Fact Verification GPT4 Response'] = df.apply(lambda row: llmFactualVerification(row['Question'], row['gpt-4-turbo_response']),axis=1)
 """ df['Contextual Relevance GPT3.5 Response'] = df.apply(
     lambda row: round(contextual_relevance(row['Question Embedding'], row['LLM GPT 3.5 Response Embedding']),2), axis=1)
 df['Contextual Relevance GPT4 Response'] = df.apply(
