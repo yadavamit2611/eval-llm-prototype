@@ -217,5 +217,32 @@ def generateScore():
     
     return jsonify(evaluated_results),200
 
+@app.route('/api/evalOne', methods=['POST'])
+def evalOne():
+    payload = request.get_json()
+    required = ['question', 'ideal_answer', 'llm_response']
+    if required[0] and required[1] and required[2] not in payload:
+        return jsonify({'error': 'Missing required parameters in request payload'}), 400
+    question = payload['question']
+    ideal_answer = payload['ideal_answer']
+    llm_response = payload['llm_response']
+    print(question, ideal_answer, llm_response)
+    
+    llmScore = {
+        "hypothesis" : llm_response,
+        "bleu" : calculate_bleu(ideal_answer, llm_response),
+        "meteor" : calculate_meteor(ideal_answer, llm_response),
+        "rouge" : calculate_rouge(ideal_answer, llm_response)
+    }
+
+    evaluated_results = {
+        "question" : question,
+        "ideal_answer" : ideal_answer,
+        "llm-results" : llmScore,
+    }
+    
+    return jsonify(evaluated_results),200
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
