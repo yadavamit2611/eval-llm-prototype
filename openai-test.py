@@ -1,4 +1,7 @@
 import openai
+import os
+
+print(os.getenv("OPENAI_API_KEY"))
 
 """ client = OpenAI() """
 question = "what is an algorithm?"
@@ -19,7 +22,7 @@ On a scale of 0.0 to 1.0, where 1.0 means the answer is completely factually cor
 """
 
 completion = openai.ChatCompletion.create(
-  model="gpt-4-turbo",
+  model="gpt-4",
   messages=[
     {"role": "system", "content": "You are a judge who is responds with just one numerical value in between 0.0 to 1.0 based on the prompt provided"},
     {"role": "user", "content": prompt}

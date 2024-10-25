@@ -93,8 +93,6 @@ df['SemanticSimilarity GPT4 Response'] = df.apply(
 #verify from gpt-4
 def llmFactualVerification(question, claim):
     prompt = f"""
-    Your task is to evaluate whether the answer for the given question is factually correct based on your knowledge.
-    Return the factual correctness score only as a numerical value between 0.0 and 1.0. 
     Question: {question}
     Answer: {claim}
     """
