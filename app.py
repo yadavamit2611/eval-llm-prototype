@@ -36,10 +36,10 @@ gpt2tokenizer = GPT2Tokenizer.from_pretrained(gpt2_model_name)
 gpt2model = GPT2LMHeadModel.from_pretrained(gpt2_model_name)
 gpt2model.eval()
 
-def preprocess_text(text):
+""" def preprocess_text(text):
     tokens = word_tokenize(text)
     tokens = [word for word in tokens if word.isalnum() and word not in stop_words]
-    return ' '.join(tokens)
+    return ' '.join(tokens) """
 
 
 # Configure upload folder
