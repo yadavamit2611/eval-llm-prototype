@@ -26,7 +26,8 @@ completion = openai.ChatCompletion.create(
   messages=[
     {"role": "system", "content": "You are a judge who is responds with just one numerical value in between 0.0 to 1.0 based on the prompt provided"},
     {"role": "user", "content": prompt}
-  ]
+  ],
+  temperature=0.5,
 )
 
 print(completion.choices[0].message.content)

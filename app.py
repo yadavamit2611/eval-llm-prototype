@@ -234,9 +234,9 @@ def llmFactualVerification(question, claim):
     response = openai.ChatCompletion.create(
         model="gpt-4",  # You can switch to "gpt-4" if needed
         messages=[
-            {"role": "system", "content": "You are a judge who responds with just one numerical value in between 0.0 to 1.0 based on the prompt provided"},
+            {"role": "system", "content": "You are a judge who responds with just a numerical value in between 0.0 to 1.0 based on the prompt provided"},
             {"role": "user", "content": prompt}
-        ],
+        ]
     )
 
     # Extracting the numerical value from the response
@@ -380,12 +380,25 @@ def evalOne():
     ideal_answer = payload['ideal_answer']
     llm_response = payload['llm_response']
     print(question, ideal_answer, llm_response)
-    
+
+    ideal_answer_embedding = get_bert_embedding(ideal_answer)
+    llm_response_embedding = get_bert_embedding(llm_response)
+    semanticsimilarity = compute_cosine_similarity(ideal_answer_embedding,llm_response_embedding)
+    BERTScore = calculate_BERTScore(ideal_answer, llm_response)
+    factualscore = llmFactualVerification(question, llm_response)
+
+    llm_composite_score = compute_composite_score(semanticsimilarity,factualscore,BERTScore,weights)
+
     llmScore = {
-        "hypothesis" : llm_response,
-        "bleu" : calculate_bleu(ideal_answer, llm_response),
-        "meteor" : calculate_meteor(ideal_answer, llm_response),
-        "rouge" : calculate_rouge(ideal_answer, llm_response)
+        "hypothesis": llm_response,
+        "bleu": calculate_bleu(ideal_answer, llm_response),
+        "meteor": calculate_meteor(ideal_answer, llm_response),
+        "rouge": calculate_rouge(ideal_answer, llm_response),
+        "perplexity": calculate_perplexity(gpt2model, gpt2tokenizer, llm_response),
+        "semanticsimilarity": semanticsimilarity,
+        "BERTScore": BERTScore,
+        "factualscore": factualscore,
+        "compositescore": llm_composite_score
     }
 
     evaluated_results = {
@@ -417,23 +430,30 @@ def get_testdata():
 @app.route('/api/generate-answers', methods=['POST'])
 def generateAnswers():
     payload = request.get_json()
-    required = ['question', 'ideal_answer']
+    required = ['question', 'ideal_answer','selectedModel']
     if required[0] and required[1] not in payload:
         return jsonify({'error': 'Missing question and ideal answer parameter in request payload'}), 400
     question = payload['question']
     ideal_answer = payload['ideal_answer']
+    selectedModed = payload['selectedModel']
 
-    gpt3pt5_response = get_llm_response(question, 'gpt-3.5-turbo')
-    gpt4_response = get_llm_response(question, 'gpt-4-turbo')
-
-    llm_responses = {
+    if selectedModed=='gpt-3.5' :
+        gpt3pt5_response = get_llm_response(question, 'gpt-3.5-turbo')
+        llm_responses = {
         "question" : question,
         "ideal_answer" : ideal_answer,
-        "gpt-4-response": gpt4_response,
-        "gpt-3.5-response": gpt3pt5_response
-    }
+        "result": gpt3pt5_response
+        }
+        return jsonify(llm_responses),200
+    else:
+        gpt4_response = get_llm_response(question, 'gpt-4-turbo')
+        llm_responses = {
+        "question" : question,
+        "ideal_answer" : ideal_answer,
+        "result": gpt4_response
+        }
+        return jsonify(llm_responses),200        
 
-    return jsonify(llm_responses),200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
